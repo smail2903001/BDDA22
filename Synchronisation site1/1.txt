@@ -1,0 +1,15 @@
+create or replace trigger SYNCH_DUPLI_Client
+before insert or update or delete on Client1
+for each row
+begin
+    begin
+      if inserting then
+          insert into client1@liensite2 values
+          (:new.noclient,:new.nomclient,:new.prenomclient,:new.villeclient,:new.age);
+      elsif updating then
+          update client1@liensite2 set villeclient=:new.villeclient,age=:new.age where noclient=:new.noclient;
+      elsif deleting then
+          delete from client1@liensite2 where noclient=:old.noclient;
+      end if;
+    end;
+end;

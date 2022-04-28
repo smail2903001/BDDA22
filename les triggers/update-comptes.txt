@@ -1,0 +1,67 @@
+create or replace 
+trigger upd_comptes
+before update on comptes
+for each row
+begin
+ declare
+  NS comptes.solde%type:=:new.solde;
+  OS comptes.solde%type:=:old.solde;
+  V client.villeclient%type;
+  L client%rowtype;
+  n integer;
+  begin
+   select villeclient into V from client 
+   where noclient=:new.noclient;
+  if(V='Casablanca') then
+    if(OS<0) then
+     if(NS<0) then
+      update comptes1@liensite1 set solde=NS
+      where idcompte=:new.idcompte;
+     else
+      delete from comptes1@liensite1 where idcompte=:new.idcompte;
+      select count(idcompte) into n from comptes1@liensite1 where 
+      noclient=:new.noclient;
+      if(n=0)then
+       delete from client1@liensite1 where noclient=:new.noclient;
+      end if;
+     end if;
+  else --OS>=0
+   if(NS<0) then
+    select count(noclient) into n from client1@liensite1 where
+    noclient=:new.noclient;
+    if (n=0) then
+     select * into L from client where noclient=:new.noclient;
+     insert into client1@liensite1 values L;
+    end if;
+    insert into comptes1@liensite1 values (:new.idcompte,:new.ncompte,:new.solde,
+    :new.noclient,:new.codeagence);
+  end if;
+ end if;
+elsif (V='Rabat')then
+   if(OS>=0) then
+     if(NS>=0) then
+      update comptes2@liensite2 set solde=NS
+      where idcompte=:new.idcompte;
+     else
+      delete from comptes2@liensite2 where idcompte=:new.idcompte;
+      select count(idcompte) into n from comptes2@liensite2 where 
+      noclient=:new.noclient;
+     if(n=0)then
+      delete from client2@liensite2 where noclient=:new.noclient;
+     end if;
+    end if;
+  else 
+   if(NS>=0) then
+    select count(noclient) into n from client2@liensite2 where
+    noclient=:new.noclient;
+    if (n=0) then
+     select * into L from client where noclient=:new.noclient;
+     insert into client2@liensite2 values L;
+    end if;
+    insert into comptes2@liensite2 values (:new.idcompte,:new.ncompte,:new.solde,
+    :new.noclient,:new.codeagence);
+  end if;
+ end if;
+end if;
+end;
+end;

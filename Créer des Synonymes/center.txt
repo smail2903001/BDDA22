@@ -1,0 +1,5 @@
+create or replace  public synonym ClientSite1 for Client1@lienSite1;
+create or replace public synonym ComptesSite1 for Comptes1@lienSite1;
+ 
+create or replace  public synonym ClientSite2 for Client2@lienSite2;
+create or replace public synonym ComptesSite2 for Comptes2@lienSite2;

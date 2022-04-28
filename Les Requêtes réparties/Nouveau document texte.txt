@@ -1,0 +1,22 @@
+--R1
+select distinct *
+from (select client.* from client@LIENCENTER,comptes@LIENCENTER
+where client.noclient=comptes.noclient   
+and villeclient='Casablanca'
+and solde>=0)
+where noclient in (select noclient from 
+(select client.* from client@LIENCENTER,comptes@LIENCENTER 
+where client.noclient=comptes.noclient 
+and villeclient='Casablanca'
+and solde<0));
+
+
+--R2
+
+select distinct*
+from 
+(select client.* from client@LIENCENTER,comptes@LIENCENTER
+where client.noclient=comptes.noclient 
+and villeclient='Casablanca' 
+and solde>=0)
+where noclient in (select noclient from client1);

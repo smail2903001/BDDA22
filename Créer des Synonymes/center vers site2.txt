@@ -1,0 +1,3 @@
+CREATE PUBLIC SYNONYM Clientsite2 FOR Client2Site2@lienSite2;
+CREATE PUBLIC SYNONYM ComptesSite2 FOR Comptes2Site2@lienSite2;
+CREATE PUBLIC SYNONYM AgenceSite2 FOR Agence2Site2@lienSite2;

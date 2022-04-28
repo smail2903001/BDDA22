@@ -1,0 +1,20 @@
+create table comptes1 as
+select comptes.* from client@LIENCENTER,comptes@LIENCENTER
+where client.noclient=comptes.noclient
+and VILLECLIENT='Casablanca' and solde<0;
+
+
+create table client1 as
+select * from client@LIENCENTER
+where noclient in
+(select noclient from comptes1);
+
+
+alter table client1 add CONSTRAINT c1 PRIMARY key(noclient);
+
+
+alter table comptes1 add CONSTRAINT c2 PRIMARY key(IDcompte);
+
+
+alter table comptes1 add CONSTRAINT f1 FOREIGN key(noclient)
+ REFERENCES client1(noclient) on DELETE  CASCADE ;

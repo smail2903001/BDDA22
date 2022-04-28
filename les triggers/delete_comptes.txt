@@ -1,0 +1,33 @@
+create or replace 
+trigger delete_comptes
+before delete on comptes
+for each row
+begin
+ declare
+ OS comptes.solde%type:=:old.solde;
+ VC client.VILLECLIENT%type;
+ n1 integer;
+ n2 integer;
+ n3 integer;
+ table_Mutante exception;
+ pragma exception_init(table_mutante, -4091) ;
+ begin
+ select villeclient into VC from client where noclient=:old.noclient;
+ if(VC='Casablanca' and OS<0) then
+   delete from ComptesSite1 where idcompte=:old.idcompte;
+   select count(idcompte) into n1 from comptes1@liensite1 where NOCLIENT=:old.NOCLIENT;
+   if n1=0 then
+    delete from client1@liensite1 where NOCLIENT=:old.NOCLIENT;
+   end if;
+ elsif(VC='Rabat'and OS>=0) then
+  delete from comptes2@liensite2 where idcompte=:old.idcompte;
+  select count(idcompte) into n2 from comptes2@liensite2 where NOCLIENT=:old.NOCLIENT;
+   if n2=0 then
+    delete from ClientSite2 where NOCLIENT=:old.NOCLIENT;
+   end if;
+ end if;
+ exception
+ when table_mutante then
+ DBMS_OUTPUT.PUT_LINE('erreur non pertinante') ;
+ end;
+end;

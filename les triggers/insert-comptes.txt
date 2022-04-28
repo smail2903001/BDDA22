@@ -1,0 +1,32 @@
+create or replace 
+trigger Synch_Insert_Comptes
+before insert on comptes
+for each row
+begin
+declare
+     V client.villeclient%type;
+     NS comptes.solde%type:=:new.solde;
+     R client%rowtype;
+     A agence%rowtype;
+     n integer;
+begin 
+    select villeclient into  V from client where noclient=:new.noclient;
+    if( V='Casablanca' and NS<0 ) then
+        select count(*) into n from usersite1.client1@liensite1 where  noclient=:new.noclient; 
+        if(n=0) then
+            select * into R  from client  where noclient=:new.noclient;
+            insert into client1@liensite1 values R;
+        end if;
+        insert into comptes1@liensite1 values 
+        (:new.idcompte,:new.ncompte,:new.solde,:new.noclient,:new.codeagence);
+    elsif ( V='Rabat' and NS>=0 ) then
+        select count(*) into n from  client1@liensite1 where  noclient=:new.noclient; 
+        if(n=0) then
+            select * into R  from client  where noclient=:new.noclient;
+            insert into client2@liensite2 values R;
+        end if;
+        insert into comptes2@liensite2 values 
+        (:new.idcompte,:new.ncompte,:new.solde,:new.noclient,:new.codeagence);
+    end if;
+end;
+end;

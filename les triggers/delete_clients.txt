@@ -1,0 +1,19 @@
+create or replace 
+trigger Synch_Delete_Client
+before delete on client
+for each row
+begin
+declare
+      OV client.villeclient%type:=:old.villeclient;
+      R client%rowtype;
+      n integer;
+begin
+      if(OV='Casablanca') then
+          delete from usersite1.client1@liensite1 where noclient=:old.noclient;
+          DELETE FROM usersite1.comptes1@liensite1 WHERE noclient=:old.noclient;
+      elsif (OV='Rabat') then 
+          delete from usersite2.client2@liensite2 where noclient=:old.noclient;
+          DELETE FROM usersite2.comptes2@liensite2 WHERE noclient=:old.noclient;
+      end if;
+end;
+end;

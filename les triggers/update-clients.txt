@@ -1,0 +1,79 @@
+create or replace 
+trigger upd_client
+before update on client
+for each row
+begin
+ declare
+  OV client.villeclient%type:=:old.villeclient;
+  NV client.villeclient%type:=:new.villeclient;
+  n1 integer;
+  n2 integer;
+  L comptes%rowtype;
+  cursor cur1 is (select * from comptes where noclient=:new.noclient AND solde<0);
+  cursor cur2 is (select * from comptes where noclient=:new.noclient AND solde>=0);
+ begin
+  select count(idcompte) into n1 from comptes where noclient=:new.noclient AND solde<0;
+  select count(idcompte) into n2 from comptes where noclient=:new.noclient AND solde>=0;
+  if(OV='Casablanca') then
+     if(NV='Casablanca') then
+       if (n1>0) then
+        update  client1@liensite1 set AGE=:new.age where
+        noclient=:new.noclient;
+       end if;
+    else
+       if (n1>0) then
+        delete from client1@liensite1 where noclient=:new.noclient;
+       end if;
+    if(NV='Rabat') then
+       if (n2>0) then
+        insert into client2@liensite2 values (:new.noclient, :new.nomclient,
+        :new.prenomclient, :new.villeclient, :new.Age);
+       for n in cur2 loop
+        L:=n;
+        insert into comptes1@liensite1 values L;
+       end loop;
+       end if;
+    end if;
+    end if;
+ elsif(OV='Rabat') then
+    if(NV='Rabat') then
+      if (n2>0) then
+       update client2@liensite2 set AGE=:new.AGE
+       where noclient=:new.noclient;
+      end if;
+    else
+      if (n2>0) then
+       delete from client2@liensite2 where noclient=:new.noclient;
+      end if;
+    if(NV='Casablanca') then
+      if (n1>0) then
+        insert into client1@liensite1 values (:new.noclient, :new.nomclient,
+        :new.prenomclient, :new.villeclient, :new.Age);
+       for n in cur1 loop
+        L:=n;
+        insert into comptes1@liensite1 values L;
+       end loop;
+      end if;
+    end if;
+    end if;
+ elsif(NV='Casablanca') then
+   if (n1>0) then
+    insert into client1@liensite1 values (:new.noclient, :new.nomclient,
+    :new.prenomclient, :new.villeclient, :new.Age);
+    for n in cur1 loop
+     L:=n;
+     insert into comptes1@liensite1 values L;
+    end loop;
+   end if;
+ elsif(NV='Rabat') then
+   if (n2>0) then
+    insert into client2@liensite2 values (:new.noclient, :new.nomclient,
+    :new.prenomclient, :new.villeclient, :new.Age);
+    for n in cur2 loop
+     L:=n;
+     insert into comptes2@liensite2 values L;
+    end loop;
+   end if;
+ end if;
+end;
+end;
